@@ -1,0 +1,547 @@
+import React, { useState, useEffect } from 'react';
+import { Plus, Edit, Trash2, Car, Fuel, Wrench, Calendar, DollarSign, BarChart3 } from 'lucide-react';
+
+const CarTracker = () => {
+  const [activeTab, setActiveTab] = useState('fuel');
+  const [fuelRecords, setFuelRecords] = useState([]);
+  const [maintenanceRecords, setMaintenanceRecords] = useState([]);
+  const [scheduledMaintenance, setScheduledMaintenance] = useState([]);
+  
+  // Fuel form state
+  const [fuelForm, setFuelForm] = useState({
+    date: new Date().toISOString().split('T')[0],
+    odometer: '',
+    gallons: '',
+    cost: '',
+    station: '',
+    notes: ''
+  });
+  
+  // Maintenance form state
+  const [maintenanceForm, setMaintenanceForm] = useState({
+    date: new Date().toISOString().split('T')[0],
+    odometer: '',
+    type: '',
+    description: '',
+    cost: '',
+    location: '',
+    notes: ''
+  });
+  
+  // Scheduled maintenance form state
+  const [scheduledForm, setScheduledForm] = useState({
+    type: '',
+    description: '',
+    dueOdometer: '',
+    dueDate: '',
+    priority: 'medium',
+    notes: ''
+  });
+
+  const addFuelRecord = () => {
+    if (fuelForm.odometer && fuelForm.gallons && fuelForm.cost) {
+      const newRecord = {
+        ...fuelForm,
+        id: Date.now(),
+        mpg: fuelRecords.length > 0 ? 
+          ((parseFloat(fuelForm.odometer) - parseFloat(fuelRecords[fuelRecords.length - 1].odometer)) / parseFloat(fuelForm.gallons)).toFixed(2) : 
+          'N/A'
+      };
+      setFuelRecords([...fuelRecords, newRecord]);
+      setFuelForm({
+        date: new Date().toISOString().split('T')[0],
+        odometer: '',
+        gallons: '',
+        cost: '',
+        station: '',
+        notes: ''
+      });
+    }
+  };
+
+  const addMaintenanceRecord = () => {
+    if (maintenanceForm.type && maintenanceForm.description) {
+      const newRecord = {
+        ...maintenanceForm,
+        id: Date.now()
+      };
+      setMaintenanceRecords([...maintenanceRecords, newRecord]);
+      setMaintenanceForm({
+        date: new Date().toISOString().split('T')[0],
+        odometer: '',
+        type: '',
+        description: '',
+        cost: '',
+        location: '',
+        notes: ''
+      });
+    }
+  };
+
+  const addScheduledMaintenance = () => {
+    if (scheduledForm.type && scheduledForm.description) {
+      const newRecord = {
+        ...scheduledForm,
+        id: Date.now(),
+        completed: false
+      };
+      setScheduledMaintenance([...scheduledMaintenance, newRecord]);
+      setScheduledForm({
+        type: '',
+        description: '',
+        dueOdometer: '',
+        dueDate: '',
+        priority: 'medium',
+        notes: ''
+      });
+    }
+  };
+
+  const deleteRecord = (id, type) => {
+    if (type === 'fuel') {
+      setFuelRecords(fuelRecords.filter(record => record.id !== id));
+    } else if (type === 'maintenance') {
+      setMaintenanceRecords(maintenanceRecords.filter(record => record.id !== id));
+    } else if (type === 'scheduled') {
+      setScheduledMaintenance(scheduledMaintenance.filter(record => record.id !== id));
+    }
+  };
+
+  const toggleScheduledComplete = (id) => {
+    setScheduledMaintenance(scheduledMaintenance.map(record => 
+      record.id === id ? { ...record, completed: !record.completed } : record
+    ));
+  };
+
+  const calculateStats = () => {
+    const totalFuelCost = fuelRecords.reduce((sum, record) => sum + parseFloat(record.cost || 0), 0);
+    const totalMaintenanceCost = maintenanceRecords.reduce((sum, record) => sum + parseFloat(record.cost || 0), 0);
+    const totalGallons = fuelRecords.reduce((sum, record) => sum + parseFloat(record.gallons || 0), 0);
+    const avgMPG = fuelRecords.length > 1 ? 
+      (fuelRecords.filter(r => r.mpg !== 'N/A').reduce((sum, record) => sum + parseFloat(record.mpg || 0), 0) / 
+       fuelRecords.filter(r => r.mpg !== 'N/A').length).toFixed(2) : 'N/A';
+
+    return {
+      totalFuelCost: totalFuelCost.toFixed(2),
+      totalMaintenanceCost: totalMaintenanceCost.toFixed(2),
+      totalCost: (totalFuelCost + totalMaintenanceCost).toFixed(2),
+      totalGallons: totalGallons.toFixed(1),
+      avgMPG
+    };
+  };
+
+  const stats = calculateStats();
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          {/* Header */}
+          <div className="bg-blue-600 text-white p-6">
+            <div className="flex items-center gap-3">
+              <Car className="w-8 h-8" />
+              <h1 className="text-3xl font-bold">Car Maintenance & Fuel Tracker</h1>
+            </div>
+          </div>
+
+          {/* Stats Dashboard */}
+          <div className="p-6 bg-gray-100 border-b">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <BarChart3 className="w-5 h-5" />
+              Quick Stats
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="bg-white p-4 rounded-lg text-center">
+                <div className="text-2xl font-bold text-blue-600">${stats.totalFuelCost}</div>
+                <div className="text-sm text-gray-600">Total Fuel Cost</div>
+              </div>
+              <div className="bg-white p-4 rounded-lg text-center">
+                <div className="text-2xl font-bold text-green-600">${stats.totalMaintenanceCost}</div>
+                <div className="text-sm text-gray-600">Maintenance Cost</div>
+              </div>
+              <div className="bg-white p-4 rounded-lg text-center">
+                <div className="text-2xl font-bold text-purple-600">${stats.totalCost}</div>
+                <div className="text-sm text-gray-600">Total Cost</div>
+              </div>
+              <div className="bg-white p-4 rounded-lg text-center">
+                <div className="text-2xl font-bold text-orange-600">{stats.totalGallons}</div>
+                <div className="text-sm text-gray-600">Total Gallons</div>
+              </div>
+              <div className="bg-white p-4 rounded-lg text-center">
+                <div className="text-2xl font-bold text-red-600">{stats.avgMPG}</div>
+                <div className="text-sm text-gray-600">Avg MPG</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Tab Navigation */}
+          <div className="border-b">
+            <nav className="flex">
+              <button
+                onClick={() => setActiveTab('fuel')}
+                className={`px-6 py-3 font-medium flex items-center gap-2 ${
+                  activeTab === 'fuel' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600'
+                }`}
+              >
+                <Fuel className="w-4 h-4" />
+                Fuel Records
+              </button>
+              <button
+                onClick={() => setActiveTab('maintenance')}
+                className={`px-6 py-3 font-medium flex items-center gap-2 ${
+                  activeTab === 'maintenance' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600'
+                }`}
+              >
+                <Wrench className="w-4 h-4" />
+                Maintenance
+              </button>
+              <button
+                onClick={() => setActiveTab('scheduled')}
+                className={`px-6 py-3 font-medium flex items-center gap-2 ${
+                  activeTab === 'scheduled' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600'
+                }`}
+              >
+                <Calendar className="w-4 h-4" />
+                Scheduled
+              </button>
+            </nav>
+          </div>
+
+          {/* Content */}
+          <div className="p-6">
+            {/* Fuel Records Tab */}
+            {activeTab === 'fuel' && (
+              <div>
+                <h3 className="text-xl font-semibold mb-4">Add Fuel Record</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                  <input
+                    type="date"
+                    value={fuelForm.date}
+                    onChange={(e) => setFuelForm({...fuelForm, date: e.target.value})}
+                    className="p-2 border rounded"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Odometer Reading"
+                    value={fuelForm.odometer}
+                    onChange={(e) => setFuelForm({...fuelForm, odometer: e.target.value})}
+                    className="p-2 border rounded"
+                  />
+                  <input
+                    type="number"
+                    step="0.01"
+                    placeholder="Gallons"
+                    value={fuelForm.gallons}
+                    onChange={(e) => setFuelForm({...fuelForm, gallons: e.target.value})}
+                    className="p-2 border rounded"
+                  />
+                  <input
+                    type="number"
+                    step="0.01"
+                    placeholder="Total Cost ($)"
+                    value={fuelForm.cost}
+                    onChange={(e) => setFuelForm({...fuelForm, cost: e.target.value})}
+                    className="p-2 border rounded"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Gas Station"
+                    value={fuelForm.station}
+                    onChange={(e) => setFuelForm({...fuelForm, station: e.target.value})}
+                    className="p-2 border rounded"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Notes"
+                    value={fuelForm.notes}
+                    onChange={(e) => setFuelForm({...fuelForm, notes: e.target.value})}
+                    className="p-2 border rounded"
+                  />
+                  <button
+                    onClick={addFuelRecord}
+                    className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 flex items-center justify-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Record
+                  </button>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse border border-gray-300">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border p-2 text-left">Date</th>
+                        <th className="border p-2 text-left">Odometer</th>
+                        <th className="border p-2 text-left">Gallons</th>
+                        <th className="border p-2 text-left">Cost</th>
+                        <th className="border p-2 text-left">PPG</th>
+                        <th className="border p-2 text-left">MPG</th>
+                        <th className="border p-2 text-left">Station</th>
+                        <th className="border p-2 text-left">Notes</th>
+                        <th className="border p-2 text-left">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {fuelRecords.map((record) => (
+                        <tr key={record.id}>
+                          <td className="border p-2">{record.date}</td>
+                          <td className="border p-2">{record.odometer}</td>
+                          <td className="border p-2">{record.gallons}</td>
+                          <td className="border p-2">${record.cost}</td>
+                          <td className="border p-2">${(parseFloat(record.cost) / parseFloat(record.gallons)).toFixed(2)}</td>
+                          <td className="border p-2">{record.mpg}</td>
+                          <td className="border p-2">{record.station}</td>
+                          <td className="border p-2">{record.notes}</td>
+                          <td className="border p-2">
+                            <button
+                              onClick={() => deleteRecord(record.id, 'fuel')}
+                              className="text-red-600 hover:text-red-800"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Maintenance Records Tab */}
+            {activeTab === 'maintenance' && (
+              <div>
+                <h3 className="text-xl font-semibold mb-4">Add Maintenance Record</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                  <input
+                    type="date"
+                    value={maintenanceForm.date}
+                    onChange={(e) => setMaintenanceForm({...maintenanceForm, date: e.target.value})}
+                    className="p-2 border rounded"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Odometer Reading"
+                    value={maintenanceForm.odometer}
+                    onChange={(e) => setMaintenanceForm({...maintenanceForm, odometer: e.target.value})}
+                    className="p-2 border rounded"
+                  />
+                  <select
+                    value={maintenanceForm.type}
+                    onChange={(e) => setMaintenanceForm({...maintenanceForm, type: e.target.value})}
+                    className="p-2 border rounded"
+                  >
+                    <option value="">Select Type</option>
+                    <option value="Oil Change">Oil Change</option>
+                    <option value="Tire Rotation">Tire Rotation</option>
+                    <option value="Brake Service">Brake Service</option>
+                    <option value="Air Filter">Air Filter</option>
+                    <option value="Transmission">Transmission</option>
+                    <option value="Battery">Battery</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <input
+                    type="text"
+                    placeholder="Description"
+                    value={maintenanceForm.description}
+                    onChange={(e) => setMaintenanceForm({...maintenanceForm, description: e.target.value})}
+                    className="p-2 border rounded"
+                  />
+                  <input
+                    type="number"
+                    step="0.01"
+                    placeholder="Cost ($)"
+                    value={maintenanceForm.cost}
+                    onChange={(e) => setMaintenanceForm({...maintenanceForm, cost: e.target.value})}
+                    className="p-2 border rounded"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Location/Shop"
+                    value={maintenanceForm.location}
+                    onChange={(e) => setMaintenanceForm({...maintenanceForm, location: e.target.value})}
+                    className="p-2 border rounded"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Notes"
+                    value={maintenanceForm.notes}
+                    onChange={(e) => setMaintenanceForm({...maintenanceForm, notes: e.target.value})}
+                    className="p-2 border rounded"
+                  />
+                  <button
+                    onClick={addMaintenanceRecord}
+                    className="bg-green-600 text-white p-2 rounded hover:bg-green-700 flex items-center justify-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Record
+                  </button>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse border border-gray-300">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border p-2 text-left">Date</th>
+                        <th className="border p-2 text-left">Odometer</th>
+                        <th className="border p-2 text-left">Type</th>
+                        <th className="border p-2 text-left">Description</th>
+                        <th className="border p-2 text-left">Cost</th>
+                        <th className="border p-2 text-left">Location</th>
+                        <th className="border p-2 text-left">Notes</th>
+                        <th className="border p-2 text-left">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {maintenanceRecords.map((record) => (
+                        <tr key={record.id}>
+                          <td className="border p-2">{record.date}</td>
+                          <td className="border p-2">{record.odometer}</td>
+                          <td className="border p-2">{record.type}</td>
+                          <td className="border p-2">{record.description}</td>
+                          <td className="border p-2">${record.cost}</td>
+                          <td className="border p-2">{record.location}</td>
+                          <td className="border p-2">{record.notes}</td>
+                          <td className="border p-2">
+                            <button
+                              onClick={() => deleteRecord(record.id, 'maintenance')}
+                              className="text-red-600 hover:text-red-800"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Scheduled Maintenance Tab */}
+            {activeTab === 'scheduled' && (
+              <div>
+                <h3 className="text-xl font-semibold mb-4">Add Scheduled Maintenance</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                  <select
+                    value={scheduledForm.type}
+                    onChange={(e) => setScheduledForm({...scheduledForm, type: e.target.value})}
+                    className="p-2 border rounded"
+                  >
+                    <option value="">Select Type</option>
+                    <option value="Oil Change">Oil Change</option>
+                    <option value="Tire Rotation">Tire Rotation</option>
+                    <option value="Brake Inspection">Brake Inspection</option>
+                    <option value="Air Filter">Air Filter</option>
+                    <option value="Transmission Service">Transmission Service</option>
+                    <option value="Inspection">State Inspection</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <input
+                    type="text"
+                    placeholder="Description"
+                    value={scheduledForm.description}
+                    onChange={(e) => setScheduledForm({...scheduledForm, description: e.target.value})}
+                    className="p-2 border rounded"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Due at Odometer"
+                    value={scheduledForm.dueOdometer}
+                    onChange={(e) => setScheduledForm({...scheduledForm, dueOdometer: e.target.value})}
+                    className="p-2 border rounded"
+                  />
+                  <input
+                    type="date"
+                    value={scheduledForm.dueDate}
+                    onChange={(e) => setScheduledForm({...scheduledForm, dueDate: e.target.value})}
+                    className="p-2 border rounded"
+                  />
+                  <select
+                    value={scheduledForm.priority}
+                    onChange={(e) => setScheduledForm({...scheduledForm, priority: e.target.value})}
+                    className="p-2 border rounded"
+                  >
+                    <option value="low">Low Priority</option>
+                    <option value="medium">Medium Priority</option>
+                    <option value="high">High Priority</option>
+                  </select>
+                  <input
+                    type="text"
+                    placeholder="Notes"
+                    value={scheduledForm.notes}
+                    onChange={(e) => setScheduledForm({...scheduledForm, notes: e.target.value})}
+                    className="p-2 border rounded"
+                  />
+                  <button
+                    onClick={addScheduledMaintenance}
+                    className="bg-orange-600 text-white p-2 rounded hover:bg-orange-700 flex items-center justify-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Schedule
+                  </button>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse border border-gray-300">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border p-2 text-left">Status</th>
+                        <th className="border p-2 text-left">Type</th>
+                        <th className="border p-2 text-left">Description</th>
+                        <th className="border p-2 text-left">Due Odometer</th>
+                        <th className="border p-2 text-left">Due Date</th>
+                        <th className="border p-2 text-left">Priority</th>
+                        <th className="border p-2 text-left">Notes</th>
+                        <th className="border p-2 text-left">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {scheduledMaintenance.map((record) => (
+                        <tr key={record.id} className={record.completed ? 'bg-green-50' : ''}>
+                          <td className="border p-2">
+                            <input
+                              type="checkbox"
+                              checked={record.completed}
+                              onChange={() => toggleScheduledComplete(record.id)}
+                              className="mr-2"
+                            />
+                            {record.completed ? 'Complete' : 'Pending'}
+                          </td>
+                          <td className="border p-2">{record.type}</td>
+                          <td className="border p-2">{record.description}</td>
+                          <td className="border p-2">{record.dueOdometer}</td>
+                          <td className="border p-2">{record.dueDate}</td>
+                          <td className="border p-2">
+                            <span className={`px-2 py-1 rounded text-xs ${
+                              record.priority === 'high' ? 'bg-red-100 text-red-800' :
+                              record.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-green-100 text-green-800'
+                            }`}>
+                              {record.priority}
+                            </span>
+                          </td>
+                          <td className="border p-2">{record.notes}</td>
+                          <td className="border p-2">
+                            <button
+                              onClick={() => deleteRecord(record.id, 'scheduled')}
+                              className="text-red-600 hover:text-red-800"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CarTracker;
