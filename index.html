@@ -1,115 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>shlimmy - GitHub Pages</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .container {
-            text-align: center;
-            max-width: 600px;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, #fff, #f0f0f0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-
-        .projects {
-            margin-top: 2rem;
-        }
-
-        .project-link {
-            display: inline-block;
-            margin: 0.5rem;
-            padding: 0.8rem 1.5rem;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .project-link:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .github-link {
-            margin-top: 2rem;
-            opacity: 0.8;
-        }
-
-        .github-link a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .github-link a:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .container {
-                margin: 1rem;
-                padding: 1.5rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tim Richardson — IT Professional</title>
+  <meta name="description" content="Senior IT support professional with 7+ years across enterprise SaaS, MSP, and healthcare data environments. Python, PowerShell, M365, automation.">
+  <style>
+    :root {
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --bg: #ffffff;
+      --card: #f9fafb;
+      --border: #e5e7eb;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text: #f3f4f6;
+        --muted: #9ca3af;
+        --accent: #60a5fa;
+        --bg: #0f172a;
+        --card: #1e293b;
+        --border: #334155;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+    h1 { font-size: 2rem; margin: 0 0 0.25rem; }
+    .tagline { color: var(--muted); margin: 0 0 2rem; }
+    h2 { font-size: 1.2rem; margin: 2rem 0 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .projects { display: grid; gap: 1rem; }
+    .project {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+    }
+    .project h3 { margin: 0 0 0.25rem; font-size: 1.05rem; }
+    .project p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+    .skills { color: var(--muted); }
+    .contact { margin-top: 2rem; color: var(--muted); }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome</h1>
-        <p class="subtitle">shlimmy's GitHub Pages</p>
-        
-        <div class="projects">
-            <h3 style="margin-bottom: 1rem;">My Projects</h3>
-            <a href="/timpython2013.github.io/car-tracker" class="project-link">Car Tracker</a>
-            <!-- Add more project links here as you create them -->
-        </div>
-        
-        <div class="github-link">
-            <p>View my code on <a href="https://github.com/timpython2013" target="_blank">GitHub</a></p>
-        </div>
+
+  <h1>Tim Richardson</h1>
+  <p class="tagline">Senior IT support professional — Python, PowerShell, M365, automation.</p>
+
+  <p>7+ years across enterprise SaaS, MSP, and healthcare data environments. I build practical automation to make support work faster, and I'm always picking up something new on the side.</p>
+
+  <h2>What I work with</h2>
+  <p class="skills">
+    Python · PowerShell · Bash · SQL (MS SQL, Oracle) · Microsoft 365 · Active Directory · Azure · AWS · Okta · ServiceNow · Jira · Splunk · PowerBI
+  </p>
+
+  <h2>Side projects</h2>
+  <div class="projects">
+    <div class="project">
+      <h3><a href="https://github.com/timpython2013/diabetes-data-analysis">diabetes-data-analysis</a></h3>
+      <p>Exploratory data analysis on a public diabetes dataset (Python, Jupyter).</p>
     </div>
+    <div class="project">
+      <h3><a href="https://github.com/timpython2013/bp-tracker">bp-tracker</a></h3>
+      <p>Blood pressure logging tool built with vanilla JavaScript.</p>
+    </div>
+    <div class="project">
+      <h3><a href="https://github.com/timpython2013/Linux-Scripting">Linux-Scripting</a></h3>
+      <p>Python utilities and shell scripts for Linux automation.</p>
+    </div>
+  </div>
+
+  <h2>Get in touch</h2>
+  <p class="contact">
+    <a href="https://github.com/timpython2013">GitHub</a> ·
+    <a href="mailto:timmyrich333@gmail.com">timmyrich333@gmail.com</a>
+  </p>
+
 </body>
 </html>
